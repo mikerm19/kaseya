@@ -1,0 +1,12 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ScriptExport xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.kaseya.com/vsa/2008/12/Scripting">
+  <Procedure name="Win - Hide Add/Remove Kaseya Agent Information" treePres="3" id="1278417991" folderId="295610573652959" treeFullPath="Customizations">
+    <Body description="Hide the entry for the Kaseya Agent in the Add/Remove Programs menu">
+      <Statement name="SetRegistryValue" continueOnFail="false" osType="Windows">
+        <Parameter xsi:type="StringParameter" name="RegistryPath" value="HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\KA#vMachine.agentInstGuid#\SystemComponent" />
+        <Parameter xsi:type="StringParameter" name="Value" value="1" />
+        <Parameter xsi:type="EnumParameter" name="DataType" value="Integer" />
+      </Statement>
+    </Body>
+  </Procedure>
+</ScriptExport>

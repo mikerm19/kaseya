@@ -1,0 +1,112 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ScriptExport xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.kaseya.com/vsa/2008/12/Scripting">
+  <Procedure name="Win - Detect Cryptolocker" treePres="3" id="407498196" folderId="505213248545868" treeFullPath="Auditing">
+    <Body description="===== General =====&#xA;Detects presense of known Cryptolocker registry keys (HKCU\Software\Cryptolocker and HKCU\Software\Cryptolocker_0388).&#xA;&#xA;===== Detected Actions =====&#xA;     -Sets Kaseya 'Cryptolocker Infected' status to Yes&#xA;     -Extracts list of encrypted files to KServer&#xA;     -Logs Error in System Log&#xA;&#xA;===== Not Detected Actions =====&#xA;     -Sets Kaseya 'Cryptolocker Infected' status to No&#xA;     -Logs Information in System Log&#xA;&#xA;===== Author =====&#xA;     NOC: MarcR&#xA;     NOC: MattK">
+      <If description="Check for CryptoLocker_0388 Registry key">
+        <Condition name="TestRegistryKey">
+          <Parameter xsi:type="StringParameter" name="Path" value="HKEY_CURRENT_USER\Software\CryptoLocker_0388" />
+          <Parameter xsi:type="EnumParameter" name="Condition" value="Exists" />
+        </Condition>
+        <Then>
+          <Statement description="Export Encrypted Files List, Upload to KServer (Agent Procedures &gt; File Transfer &gt; Get File)" name="ExecuteShellCommand" continueOnFail="false">
+            <Parameter xsi:type="StringParameter" name="Command" value="regedit.exe /e c:\temp\CryptolockerEncryptedFiles_0388.reg HKEY_CURRENT_USER\Software\CryptoLocker_0388\Files" />
+            <Parameter xsi:type="EnumParameter" name="ExecuteAccount" value="User" />
+            <Parameter xsi:type="BooleanParameter" name="Is64Bit" value="False" />
+          </Statement>
+          <Statement name="GetFile" continueOnFail="false">
+            <Parameter xsi:type="StringParameter" name="RemoteFileName" value="C:\Temp\CryptoLockerEncryptedFiles_0388.reg" />
+            <Parameter xsi:type="StringParameter" name="KServerFileName" value="CryptoLocker\CryptoLockerEncryptedFiles_0388.reg" />
+            <Parameter xsi:type="EnumParameter" name="Action" value="OverwriteSendAlert" />
+          </Statement>
+          <Statement description="Log Detection in System Log" name="Create Event Log Entry" continueOnFail="false">
+            <Parameter xsi:type="StringParameter" name="Parameter1" value="Cryptolocker Detected!" />
+            <Parameter xsi:type="EnumParameter" name="Parameter2" value="Error" />
+            <Parameter xsi:type="EnumParameter" name="Parameter3" value="System" />
+          </Statement>
+          <Statement name="SendEmail" continueOnFail="false">
+            <Parameter xsi:type="StringParameter" name="To" value="itsupport@medadvgrp.com" />
+            <Parameter xsi:type="StringParameter" name="Subject" value="Cryptolocker infection - #vAgentConfiguration.Machine_GroupID#" />
+            <Parameter xsi:type="MultiLineStringParameter" name="Body" value="#vAgentConfiguration.Machine_GroupID# is infected with Cryptolocker.&#xA;&#xA;Agent Procedure - &quot;Detect Cryptolocker&quot;" />
+          </Statement>
+        </Then>
+      </If>
+      <If description="Check for CryptoLocker Registry key">
+        <Condition name="TestRegistryKey">
+          <Parameter xsi:type="StringParameter" name="Path" value="HKEY_CURRENT_USER\Software\CryptoLocker" />
+          <Parameter xsi:type="EnumParameter" name="Condition" value="Exists" />
+        </Condition>
+        <Then>
+          <Statement name="ExecuteShellCommand" continueOnFail="false">
+            <Parameter xsi:type="StringParameter" name="Command" value="regedit.exe /e c:\temp\CryptolockerEncryptedFiles.reg HKEY_CURRENT_USER\Software\CryptoLocker\Files" />
+            <Parameter xsi:type="EnumParameter" name="ExecuteAccount" value="User" />
+            <Parameter xsi:type="BooleanParameter" name="Is64Bit" value="False" />
+          </Statement>
+          <Statement name="GetFile" continueOnFail="false">
+            <Parameter xsi:type="StringParameter" name="RemoteFileName" value="C:\Temp\CryptoLockerEncryptedFiles.reg" />
+            <Parameter xsi:type="StringParameter" name="KServerFileName" value="CryptoLocker\CryptoLockerEncryptedFiles.reg" />
+            <Parameter xsi:type="EnumParameter" name="Action" value="OverwriteSendAlert" />
+          </Statement>
+          <Statement name="Create Event Log Entry" continueOnFail="false">
+            <Parameter xsi:type="StringParameter" name="Parameter1" value="Cryptolocker Detected." />
+            <Parameter xsi:type="EnumParameter" name="Parameter2" value="Error" />
+            <Parameter xsi:type="EnumParameter" name="Parameter3" value="System" />
+          </Statement>
+          <Statement name="SendEmail" continueOnFail="false">
+            <Parameter xsi:type="StringParameter" name="To" value="itsupport@medadvgrp.com" />
+            <Parameter xsi:type="StringParameter" name="Subject" value="Cryptolocker infection - #vAgentConfiguration.Machine_GroupID#" />
+            <Parameter xsi:type="MultiLineStringParameter" name="Body" value="#vAgentConfiguration.Machine_GroupID# is infected with Cryptolocker.&#xA;&#xA;Agent Procedure - &quot;Detect Cryptolocker&quot;" />
+          </Statement>
+        </Then>
+      </If>
+      <If description="Check for CryptoWall file">
+        <Condition name="TestFile">
+          <Parameter xsi:type="StringParameter" name="Path" value="%userprofile%\DECRYPT_INSTRUCTION.txt" />
+          <Parameter xsi:type="EnumParameter" name="Condition" value="Exists" />
+          <Parameter xsi:type="StringParameter" name="Value" value="" />
+        </Condition>
+        <Then>
+          <Statement description="Log Detection in System Log, Unmap All Network Drives" name="Create Event Log Entry" continueOnFail="false">
+            <Parameter xsi:type="StringParameter" name="Parameter1" value="CryptoWall Detected." />
+            <Parameter xsi:type="EnumParameter" name="Parameter2" value="Error" />
+            <Parameter xsi:type="EnumParameter" name="Parameter3" value="System" />
+          </Statement>
+          <Statement name="SendEmail" continueOnFail="false">
+            <Parameter xsi:type="StringParameter" name="To" value="itsupport@medadvgrp.com" />
+            <Parameter xsi:type="StringParameter" name="Subject" value="CryptoWall infection - #vAgentConfiguration.Machine_GroupID#" />
+            <Parameter xsi:type="MultiLineStringParameter" name="Body" value="#vAgentConfiguration.Machine_GroupID# is infected with CryptoWall.&#xA;&#xA;Agent Procedure - &quot;Detect Cryptolocker&quot;" />
+          </Statement>
+        </Then>
+      </If>
+      <If description="If Not Infected:">
+        <Condition name="TestRegistryKey">
+          <Parameter xsi:type="StringParameter" name="Path" value="HKEY_CURRENT_USER\Software\CryptoLocker_0388" />
+          <Parameter xsi:type="EnumParameter" name="Condition" value="NotExists" />
+        </Condition>
+        <Then>
+          <If description="">
+            <Condition name="TestRegistryKey">
+              <Parameter xsi:type="StringParameter" name="Path" value="HKEY_CURRENT_USER\Software\CryptoLocker" />
+              <Parameter xsi:type="EnumParameter" name="Condition" value="NotExists" />
+            </Condition>
+            <Then>
+              <If description="">
+                <Condition name="TestFile">
+                  <Parameter xsi:type="StringParameter" name="Path" value="%userprofile%\DECRYPT_INSTRUCTION.txt" />
+                  <Parameter xsi:type="EnumParameter" name="Condition" value="NotExists" />
+                  <Parameter xsi:type="StringParameter" name="Value" value="" />
+                </Condition>
+                <Then>
+                  <Statement name="Create Event Log Entry" continueOnFail="false">
+                    <Parameter xsi:type="StringParameter" name="Parameter1" value="Cryptolocker Not Detected.  Cool Beans." />
+                    <Parameter xsi:type="EnumParameter" name="Parameter2" value="Information" />
+                    <Parameter xsi:type="EnumParameter" name="Parameter3" value="System" />
+                  </Statement>
+                </Then>
+              </If>
+            </Then>
+          </If>
+        </Then>
+      </If>
+    </Body>
+  </Procedure>
+</ScriptExport>

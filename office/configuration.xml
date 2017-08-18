@@ -1,0 +1,9 @@
+<Configuration>
+    <Add OfficeClientEdition="32" Channel="Current" SourcePath="c:\kworking\office">
+        <Product ID="O365ProPlusRetail">
+            <Language ID="en-us"/>
+        </Product>
+    </Add>
+    <Display Level="None" AcceptEULA="TRUE"/>
+    <Updates Enabled="TRUE" Channel="Current"/>
+</Configuration>

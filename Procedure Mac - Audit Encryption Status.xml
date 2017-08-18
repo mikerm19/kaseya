@@ -1,0 +1,45 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ScriptExport xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.kaseya.com/vsa/2008/12/Scripting">
+  <Procedure name="Mac - Audit Encryption Status" treePres="3" id="1779921608" folderId="505213248545868" treeFullPath="Auditing">
+    <Body description="Check if Encryption on a machine is enabled.">
+      <Statement name="Execute Shell Command - Get Results to Variable" continueOnFail="true" osType="MacOS">
+        <Parameter xsi:type="StringParameter" name="Parameter1" value="diskutil cs list | grep -e Conversion" />
+        <Parameter xsi:type="StringParameter" name="Parameter2" value="False" />
+        <Parameter xsi:type="StringParameter" name="Parameter3" value="System" />
+      </Statement>
+      <If description="">
+        <Condition name="CheckVariable">
+          <Parameter xsi:type="StringParameter" name="VariableName" value="#global:cmdresults#" />
+          <Parameter xsi:type="EnumParameter" name="Condition" value="Contains" />
+          <Parameter xsi:type="StringParameter" name="Value" value="Complete" />
+        </Condition>
+        <Then>
+          <Statement name="UpdateSystemInfo" continueOnFail="false">
+            <Parameter xsi:type="StringParameter" name="ColumnName" value="Encrypted" />
+            <Parameter xsi:type="StringParameter" name="Value" value="Yes" />
+          </Statement>
+        </Then>
+        <Else>
+          <If description="">
+            <Condition name="CheckVariable">
+              <Parameter xsi:type="StringParameter" name="VariableName" value="#vSystemInfoManual.Encrypted#" />
+              <Parameter xsi:type="EnumParameter" name="Condition" value="Contains" />
+              <Parameter xsi:type="StringParameter" name="Value" value="Yes" />
+            </Condition>
+            <Then>
+              <Statement name="SendEmail" continueOnFail="false">
+                <Parameter xsi:type="StringParameter" name="To" value="itgurus@medadvgrp.com" />
+                <Parameter xsi:type="StringParameter" name="Subject" value="Alert: Encryption May Have Been Disabled" />
+                <Parameter xsi:type="MultiLineStringParameter" name="Body" value="Encryption may have been disabled on #vAgentConfiguration.machName#" />
+              </Statement>
+            </Then>
+          </If>
+          <Statement name="UpdateSystemInfo" continueOnFail="false">
+            <Parameter xsi:type="StringParameter" name="ColumnName" value="Encrypted" />
+            <Parameter xsi:type="StringParameter" name="Value" value="No" />
+          </Statement>
+        </Else>
+      </If>
+    </Body>
+  </Procedure>
+</ScriptExport>

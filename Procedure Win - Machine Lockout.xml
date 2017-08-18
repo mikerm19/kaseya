@@ -1,0 +1,41 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ScriptExport xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.kaseya.com/vsa/2008/12/Scripting">
+  <Procedure name="Win - Machine Lockout" treePres="3" id="1027936117" folderId="275977447804053" treeFullPath="Testing">
+    <Body description="This procedure changes the number of cached logins to 0 to affectively lock out any machine not currently connected to a domain controller (aka remote) to keep anyone from logging in. Only use if management asks for a laptop to be locked out of. This action cannot be undone until the machine can log into the domain again at an office.">
+      <If description="">
+        <Condition name="True" />
+        <Then>
+          <Statement name="GetVariable" continueOnFail="false">
+            <Parameter xsi:type="EnumParameter" name="VariableType" value="Prompt" />
+            <Parameter xsi:type="StringParameter" name="SourceContent" value="Type YES to confirm you want to do this to #vMachine.machName#." />
+            <Parameter xsi:type="StringParameter" name="VariableName" value="Confirmation" />
+          </Statement>
+          <If description="">
+            <Condition name="CheckVariable">
+              <Parameter xsi:type="StringParameter" name="VariableName" value="#Confirmation#" />
+              <Parameter xsi:type="EnumParameter" name="Condition" value="Equals" />
+              <Parameter xsi:type="StringParameter" name="Value" value="YES" />
+            </Condition>
+            <Then>
+              <Statement name="SetRegistryValue64" continueOnFail="false">
+                <Parameter xsi:type="StringParameter" name="RegistryPath" value="HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon\cachedlogonscount" />
+                <Parameter xsi:type="StringParameter" name="Value" value="0" />
+                <Parameter xsi:type="EnumParameter" name="DataType" value="String" />
+              </Statement>
+              <Statement name="Execute Shell Command - Get Results to Variable" continueOnFail="false">
+                <Parameter xsi:type="StringParameter" name="Parameter1" value="shutdown /s /t 0" />
+                <Parameter xsi:type="StringParameter" name="Parameter2" value="True" />
+                <Parameter xsi:type="StringParameter" name="Parameter3" value="System" />
+              </Statement>
+              <Statement name="SendEmail" continueOnFail="false">
+                <Parameter xsi:type="StringParameter" name="To" value="itgurus@medadvgrp.com" />
+                <Parameter xsi:type="StringParameter" name="Subject" value="Kaseya Alert: Machine #vMachine.machName# Locked Out" />
+                <Parameter xsi:type="MultiLineStringParameter" name="Body" value="#vMachine.machName# was locked out by #adminDefaults.adminName#&#xA;&#xA;Current logged in user: #vAgentConfiguration.currentUser#&#xA;Last logged in user: #vAgentConfiguration.lastLoginName#" />
+              </Statement>
+            </Then>
+          </If>
+        </Then>
+      </If>
+    </Body>
+  </Procedure>
+</ScriptExport>

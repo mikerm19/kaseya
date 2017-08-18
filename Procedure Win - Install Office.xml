@@ -1,0 +1,36 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ScriptExport xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.kaseya.com/vsa/2008/12/Scripting">
+  <Procedure name="Win - Install Office" treePres="3" id="1668645270" folderId="275977447804053" treeFullPath="Testing">
+    <Body description="">
+      <Statement name="WriteFile" continueOnFail="false">
+        <Parameter xsi:type="StringParameter" name="Path" value="#vAgentConfiguration.AgentTempDir#\office\configuration.xml" />
+        <Parameter xsi:type="StringParameter" name="ManagedFile" value="VSASharedFiles\software\office\configuration.xml" />
+        <Parameter xsi:type="BooleanParameter" name="DeleteAfter" value="False" />
+      </Statement>
+      <Statement name="WriteFile" continueOnFail="false">
+        <Parameter xsi:type="StringParameter" name="Path" value="#vAgentConfiguration.AgentTempDir#\office\setup.exe" />
+        <Parameter xsi:type="StringParameter" name="ManagedFile" value="VSASharedFiles\software\office\setup.exe" />
+        <Parameter xsi:type="BooleanParameter" name="DeleteAfter" value="False" />
+      </Statement>
+      <Statement name="ExecuteFile" continueOnFail="false" osType="Windows">
+        <Parameter xsi:type="StringParameter" name="Path" value="#vAgentConfiguration.AgentTempDir#\office\setup.exe" />
+        <Parameter xsi:type="StringParameter" name="Arguments" value="/download c:\kworking\office\configuration.xml" />
+        <Parameter xsi:type="EnumParameter" name="ExecuteAccount" value="System" />
+        <Parameter xsi:type="BooleanParameter" name="WaitComplete" value="True" />
+      </Statement>
+      <Statement name="ExecuteFile" continueOnFail="false" osType="Windows">
+        <Parameter xsi:type="StringParameter" name="Path" value="#vAgentConfiguration.AgentTempDir#\office\setup.exe" />
+        <Parameter xsi:type="StringParameter" name="Arguments" value="/configure c:\kworking\office\configuration.xml" />
+        <Parameter xsi:type="EnumParameter" name="ExecuteAccount" value="System" />
+        <Parameter xsi:type="BooleanParameter" name="WaitComplete" value="True" />
+      </Statement>
+      <Statement name="Delete Directory" continueOnFail="false">
+        <Parameter xsi:type="StringParameter" name="Parameter1" value="#vAgentConfiguration.AgentTempDir#\office" />
+        <Parameter xsi:type="StringParameter" name="Parameter2" value="true" />
+      </Statement>
+      <Statement name="WriteScriptLogEntry" continueOnFail="false">
+        <Parameter xsi:type="StringParameter" name="Comment" value="Installed Office" />
+      </Statement>
+    </Body>
+  </Procedure>
+</ScriptExport>
