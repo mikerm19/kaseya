@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ScriptExport xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.kaseya.com/vsa/2008/12/Scripting">
+  <Procedure name="Win - Get BitLocker Key" treePres="3" id="1652262566" folderId="175442371878513" treeFullPath="myProcedures - mmason@medadvgrp.com">
+    <Body description="">
+      <If description="">
+        <Condition name="True" />
+        <Then>
+          <Statement name="Execute Powershell Command (64-bit, Run As System)" continueOnFail="false">
+            <Parameter xsi:type="StringParameter" name="Parameter1" value="" />
+            <Parameter xsi:type="StringParameter" name="Parameter2" value="try { $Key = (Get-BitLockerVolume).KeyProtector | Where-Object { $_.KeyProtectorType -eq 'RecoveryPassword' } ; $Key.RecoveryPassword } catch {}" />
+            <Parameter xsi:type="StringParameter" name="Parameter3" value="True" />
+          </Statement>
+          <Statement name="UpdateSystemInfo" continueOnFail="false">
+            <Parameter xsi:type="StringParameter" name="ColumnName" value="RecoveryKey" />
+            <Parameter xsi:type="StringParameter" name="Value" value="#global:psresult#" />
+          </Statement>
+        </Then>
+      </If>
+    </Body>
+  </Procedure>
+</ScriptExport>
